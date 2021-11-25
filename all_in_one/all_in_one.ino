@@ -7,6 +7,9 @@
  */
 
 #include "Arduino.h"
+#include "esp32s2LED.h"
+
+CREATE_ESP32_WS2812_INSTANCE();
 
 #define DC 1
 #ifdef DC
@@ -108,6 +111,7 @@ void keyboardTask(void* p)		// bombs real keyboard activity
 
 void setup()
 {
+  ESP32_WS2812_SETUP(15);      // WS2812 red 
   Serial.begin(115200);
 
 #ifdef DK
@@ -123,6 +127,7 @@ void setup()
   if (USBSerial.begin()) {
     USBSerial.setCallbacks(new MyCDCCallbacks());
     Serial.write("CDCusb .begin() OK\n");
+    ESP32_LED(15,15,0);
   }
   else Serial.write("Failed to start CDC USB stack\n");
 #endif
@@ -138,6 +143,7 @@ void setup()
    if (gamepad.begin()) {
      gamepad.setCallbacks(new MyHIDCallbacks());
      Serial.write("HIDgamepad .begin() OK.\n");
+     ESP32_LED(15,15,15);
    }
    else Serial.write("HIDgamepad .begin() failed.\n");
 #endif
@@ -164,6 +170,7 @@ void gamepad_task()
     i = 0;
     ping = !ping;
     Serial.printf("gamepad_task() %ld loops\n", 256 * count++);
+    ESP32_LED(((count >> 2) & 1) * (count & 15), ((count >> 1) & 1) * (count & 15), (count & 1) * (count & 15));
   }
   else i++;
 }
