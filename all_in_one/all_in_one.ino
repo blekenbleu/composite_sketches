@@ -1,38 +1,52 @@
-/**
- * This is (al)most complex example
- * Device is using all available on S2 endpoints, with 2 LUNs mounted on FAT 2 partitions
- * DFU for update from website for example, CDC and WebUSB serial and of course Serial from CP210x
+/*
+ * This is composite example
+ * Devices using available S2 endpoints
+ * HID, MIDI, CDC serial and Serial from CP210x
  * 
- * author: chegewara
+ * author: chegewara; Hacked by blekenbleu
  */
+
 #include "Arduino.h"
-#include "webusb.h"
+
+#ifdef DC
 #include "cdcusb.h"
-#include "mscusb.h"
-#include "dfuusb.h"
-#include "flashdisk.h"
+#endif
+
+#ifdef DK
+#define DHCB 1			// for MyHIDCallbacks
 #include "hidkeyboard.h"
+#endif
 
-WebUSB WebUSBSerial;
-CDCusb CDCUSBSerial;
+#define DM 1
+#ifdef DM
+#include "midiusb.h"
+#endif
+
+//#define DG 1
+#ifdef DG
+#define DHCB 1			// for MyHIDCallbacks
+#include "hidgamepad.h"
+#endif
+
+
+#ifdef DC
+CDCusb USBSerial;
+#endif
+#ifdef DK
 HIDkeyboard keyboard;
-FlashUSB fat1;
-FlashUSB fat2;
-DFUusb dfu;
+#endif
+#ifdef DM
+MIDIusb midi;
+#endif
+#ifdef DG
+HIDgamepad gamepad;
+#endif
 
-char *l1 = "ffat";
-char *l2 = "ffat1";
-
-class MyWebUSBCallbacks : public WebUSBCallbacks{
-    void onConnect(bool state) {
-      Serial.printf("webusb is %s\n", state ? "connected":"disconnected");
-    }
-};
-
+#ifdef DC
 class MyCDCCallbacks : public CDCCallbacks {
     void onCodingChange(cdc_line_coding_t const* p_line_coding)
     {
-        int bitrate = CDCUSBSerial.getBitrate();
+        int bitrate = USBSerial.getBitrate();
         Serial.printf("new bitrate: %d\n", bitrate);
     }
 
@@ -42,15 +56,18 @@ class MyCDCCallbacks : public CDCCallbacks {
         return true;  // allow to persist reset, when Arduino IDE is trying to enter bootloader mode
     }
 
+/*
     void onData()
     {
-        int len = CDCUSBSerial.available();
+        int len = USBSerial.available();
         Serial.printf("\nnew data, len %d\n", len);
         uint8_t buf[len] = {};
-        CDCUSBSerial.read(buf, len);
+        USBSerial.read(buf, len);
         Serial.write(buf, len);
     }
+ */
 };
+#endif
 
 class Device: public USBCallbacks {
     void onMount() { Serial.println("Mount"); }
@@ -59,6 +76,7 @@ class Device: public USBCallbacks {
     void onResume() { Serial.println("Resume"); }
 };
 
+#ifdef DHCB
 class MyHIDCallbacks : public HIDCallbacks
 {
     void onData(uint8_t report_id, hid_report_type_t report_type, uint8_t const *buffer, uint16_t bufsize)
@@ -70,83 +88,96 @@ class MyHIDCallbacks : public HIDCallbacks
         }
     }
 };
+#endif
 
 void setup()
 {
     Serial.begin(115200);
 
-    keyboard.setBaseEP(3);
-    keyboard.begin();
+#ifdef DK
+    keyboard.setBaseEP(4);  // was 3
+    if(keyboard.begin())
+      Serial.write("HIDkeyboard .begin() OK\n");
+    else Serial.write("HIDkeyboard .begin() false\n");
+#define DCB 1
     keyboard.setCallbacks(new MyHIDCallbacks());
+#endif
 
-    if (fat1.init("/fat1", "ffat"))
-    {
-        if (fat1.begin())
-        {
-            Serial.println("MSC lun 1 begin");
-        }
-        else
-            log_e("LUN 1 failed");
-    }
-    if (fat2.init("/fat2", "ffat1"))
-    {
-        if (fat2.begin())
-        {
-            Serial.println("MSC lun 2 begin");
-        }
-        else
-            log_e("LUN 2 failed");
-    }
+#ifdef DC
+    if (USBSerial.begin())
+        Serial.write("CDCusb .begin() OK\n");
+    else Serial.write("Failed to start CDC USB stack\n");
+#define DCB 1
+    USBSerial.setCallbacks(new MyCDCCallbacks());
+#endif
 
-    WebUSBSerial.setBaseEP(5);
-
-    if (!WebUSBSerial.begin())
-        Serial.println("Failed to start webUSB stack");
-    if (!CDCUSBSerial.begin())
-        Serial.println("Failed to start CDC USB stack");
-
-    WebUSBSerial.setCallbacks(new MyWebUSBCallbacks());
-    CDCUSBSerial.setCallbacks(new MyCDCCallbacks());
-
-    dfu.begin();
-    
+#ifdef DM
+    char port[] = "3in1";
+    if (midi.begin(port))
+      Serial.write("MIDIusb .begin() OK.\n");
+    else Serial.write("MIDIusb .begin() failed.\n");
+#endif
+#ifdef DG
+     if (gamepad.begin())
+       Serial.write("HIDgamepad .begin() OK.\n");
+     else Serial.write("HIDgamepad .begin() failed.\n");
+#endif
+#ifdef DB
     EspTinyUSB::registerDeviceCallbacks(new Device());
+#endif
 
+//  xTaskCreate(keyboardTask, "kTask", 3*1024, NULL, 5, NULL);
 
-    xTaskCreate(keyboardTask, "kTask", 3*1024, NULL, 5, NULL);
 }
 
+/*
 void keyboardTask(void* p)
 {
-    while(1)
-    {
+    while(1) {
         delay(5000);
-        Serial.println(keyboard.sendString(String("123456789\n")) ? "OK" : "FAIL");
+        Serial.println(keyboard.sendString(String("123456789\n")) ? "keyboard OK" : "keyboard FAIL");
         delay(5000);
         Serial.println(keyboard.sendString(String("abcdefghijklmnopqrst Uvwxyz\n")) ? "OK" : "FAIL");
     }
 }
-
-
-void echo_all(char c)
-{
-    WebUSBSerial.write(c);
-    CDCUSBSerial.write(c);
-    Serial.write(c);
-}
+*/
 
 void loop()
 {
-    while (WebUSBSerial.available())
-    {
-        echo_all(WebUSBSerial.read());
+    static uint8_t i = 0;
+    static uint32_t start_ms = 0;
+
+    if(0 == start_ms)
+      Serial.write("loop()ing\n");
+
+    // change once per second
+    if (millis() - start_ms >= 286) {
+      start_ms += 286;
+
+#ifdef DG
+      uint32_t buttons = i;
+      // 8 bits to 32
+      buttons |= (buttons << 8);
+      buttons |= (buttons << 16);
+      gamepad.sendAll(buttons, i, i, i, i, i, i, i%5);
+#endif
+#ifdef DM
+      midi.noteOFF(i%127, 127);
+#endif
+      if (255 <= i)
+        i = 0;
+      else i++;
+#ifdef DM
+      midi.noteON(i%127, 127);
+#endif
     }
-    while (CDCUSBSerial.available())
-    {
-        echo_all(CDCUSBSerial.read());
+
+#ifdef DC
+    while (USBSerial.available()) {
+        Serial.write(USBSerial.read());
     }
-    while (Serial.available())
-    {
-        echo_all(Serial.read());
+    while (Serial.available()) {
+        USBSerial.write(Serial.read());
     }
+#endif
 }
