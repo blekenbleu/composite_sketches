@@ -2,6 +2,9 @@
  ; Sample MIDI + gamepad sketch
  ; author: blekenbleu
  */
+#include "esp32s2LED.h"
+
+CREATE_ESP32_WS2812_INSTANCE();
 
 #if 0			// MIDI
 #define DM 1
@@ -21,30 +24,37 @@ MIDIusb midi;
 #endif
 
 void setup() {
+  ESP32_WS2812_SETUP(15);      // WS2812 red
   Serial.begin(115200);
-
+  ESP32_LED(0,15,0);
+  char name[] = "MIDIgamepad";
+  Serial.println(name);
 #ifdef DM
-  char name[] = "midi_gamepad.ino";
   midi.begin(name);
   Serial.write("MIDIusb begun\n");
+  ESP32_LED(15,15,0);
 #endif
 
 #ifdef DG
   gamepad.begin();
   Serial.write("HIDgamepad begun\n");
+  ESP32_LED(0, 0, 15);
 #endif
 
 #ifdef DM
   Serial.write("delay(1000)");  
   delay(1000);
+  ESP32_LED(15,0,15);
   if(0 && midi.setSong(song, song_len)) {
     Serial.write("midi.setSong() true\n");
     midi.playSong();
     Serial.write("midi.playSong() ended\n");
+    ESP32_LED(0,15,15);
   } else Serial.write("midi.setSong() false\n");
 #endif
 
   Serial.write("setup() complete\n");
+  ESP32_LED(15,15,15);
 }
 
 #ifdef DM
@@ -62,7 +72,7 @@ void midi_task(void)
 
   // Send Note Off for previous note.
   midi.noteOFF(note_sequence[note_pos]);
-  if (sizeof(note_sequence) == note_pos) {
+  if (sizeof(note_sequence) <= note_pos) {
     Serial.write("running midi_task();\n");
     note_pos = 0;
   }
@@ -83,6 +93,7 @@ void gamepad_task()
     gamepad.sendAll(1 << (i%32), i, i, i, i, i, i, 1 + i%8);
   else       // axes and rotations are actually 8-bit signed
     gamepad.sendAll(1 << (31 - i%32),255 - i, i, 255 -i, i, 255 - i, i, 8 - i%8);
+
   if (255 <= i) {
     i = 0;
     ping = !ping;
@@ -97,8 +108,13 @@ void loop() {
 
   // once in awhile
   if (millis() - start_ms >= 286) {
+    static uint32_t i = 0;
     start_ms += 286;
-
+  if (0 == (7 & i)) {
+    uint8_t r = 7 & start_ms, g = 7 & (start_ms>>3), b = 7 & (i>>3);
+//  Serial.printf(" r,g,b = %d,%d,%d", r, g, b);
+    ESP32_LED(r,g,b);
+  }    
 #ifdef DM
     midi_task();
 #endif
