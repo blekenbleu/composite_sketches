@@ -20,7 +20,7 @@ void setup()
   DBG_SETUP(115200);
   DBG("wESP32_NoteOnOffEverySec.ino Booting");
 
-  ETH_startup();
+  WiFi_startup();
 
   if (!MDNS.begin(AppleMIDI.getName()))
     DBG(F("Error setting up MDNS responder"));

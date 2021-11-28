@@ -1,63 +1,46 @@
-#include <ETH.h>
+#include <WiFi.h>
 #include <ESPmDNS.h>
 
-static bool eth_connected = false;
+static bool wifi_connected = false;
 
 void WiFiEvent(WiFiEvent_t event)
 {
   switch (event) {
-    case SYSTEM_EVENT_ETH_START:
-      DBG("ETH Started");
-      //set eth hostname here
-      ETH.setHostname("esp32-ethernet");
+    case ARDUINO_EVENT_WIFI_STA_START:
+      DBG("WiFi Started");
+      //set wifi hostname here
+      WiFi.setHostname("esp32-wifi");
       break;
-    case SYSTEM_EVENT_ETH_CONNECTED:
-      DBG("ETH Connected");
+    case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+      DBG("WiFi Connected");
       break;
-    case SYSTEM_EVENT_ETH_GOT_IP:
-      DBG("ETH MAC:", ETH.macAddress(), "IPv4:", ETH.localIP(), ETH.linkSpeed(), "Mbps");
-      if (ETH.fullDuplex())
-              DBG("FULL_DUPLEX");
-      eth_connected = true;
+    case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+      DBG("WiFi MAC:", WiFi.macAddress(), "IPv4:", WiFi.localIP());
+      wifi_connected = true;
       break;
-    case SYSTEM_EVENT_ETH_DISCONNECTED:
-      DBG("ETH Disconnected");
-      eth_connected = false;
+    case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+      DBG("WiFi Disconnected");
+      wifi_connected = false;
       break;
-    case SYSTEM_EVENT_ETH_STOP:
-      DBG("ETH Stopped");
-      eth_connected = false;
+    case ARDUINO_EVENT_WIFI_STA_STOP:
+      DBG("WiFi Stopped");
+      wifi_connected = false;
       break;
     default:
       break;
   }
 }
 
-bool orig_ETH_startup()
+bool WiFi_startup()
 {
   WiFi.onEvent(WiFiEvent);
-  ETH.begin();
-
-  DBG(F("Getting IP address..."));
-
-  while (!eth_connected)
-    delay(100);
-
-  return true;
-}
-
-bool ETH_startup()
-{
-  char ssid[] = "Actiontec-8318-2.4G"; //  your network SSID (name)
-  char pass[] = "e3d9dd3c";
-
-  WiFi.begin(ssid, pass);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWD);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     DBG("Establishing connection to WiFi..");
   }
   DBG("Connected to network as ", WiFi.localIP());
-  ETH.setHostname("esp32-NoteOnOff");
+  WiFi.setHostname("esp32-NoteOnOff");
   return true; 
 }
