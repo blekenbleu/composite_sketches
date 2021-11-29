@@ -10,11 +10,7 @@
 #include "AsyncTCP.h"
 #include "DNSServer.h"
 
-#define SSID "Actiontec-8318-2.4G"
-#define PASSWORD "e3d9dd3c"
-
 #define SERVER_HOST_NAME "esp-tcp-client"
-
 #define TCP_SERVER_IP "192.168.1.144"
 #define TCP_SERVER_PORT 50024
 #define DNS_PORT 53
@@ -69,7 +65,7 @@ void setup()
   // connect to access point
   Serial.write("asyncTCP-client begin.");
   WiFi.mode(WIFI_STA);
-  WiFi.begin(SSID, PASSWORD);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWD);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.write('.');
     delay(500);

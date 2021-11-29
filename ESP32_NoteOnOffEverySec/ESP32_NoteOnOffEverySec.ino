@@ -6,9 +6,6 @@
 #define APPLEMIDI_DEBUG SerialMon
 #include <AppleMIDI.h>
 
-char ssid[] = "Actiontec-8318-2.4G"; //  your network SSID (name)
-char pass[] = "e3d9dd3c";    // your network password (use for WPA, or use as key for WEP)
-
 unsigned long t0 = millis();
 int8_t isConnected = 0;
 
@@ -22,7 +19,7 @@ void setup()
   DBG_SETUP(115200);
   DBG("Booting ESP32_NoteOnOffEverySec");
 
-  WiFi.begin(ssid, pass);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWD);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
