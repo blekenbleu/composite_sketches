@@ -26,11 +26,9 @@ function getValues(){
 function initWebSocket() {
     console.log('Trying to open a WebSocket connection…');
     websocket = new WebSocket(gateway);
-    if (status.isOpen) {
-      websocket.onopen = onOpen;
-      websocket.onclose = onClose;
-      websocket.onmessage = onMessage;
-    }
+    websocket.onopen = onOpen;
+    websocket.onclose = onClose;
+    websocket.onmessage = onMessage;
 }
 
 function onOpen(event) {
@@ -49,9 +47,10 @@ function updateSliderPWM(element) {
     var sliderValue = document.getElementById(element.id).value;
     document.getElementById("sliderValue"+sliderNumber).innerHTML = sliderValue;
     //if (3 == sliderNumber) status.change = !status.isOpen;
-    console.log(sliderNumber.toString()+"="+sliderValue.toString());
-    if (status.isOpen)
+    if (status.isOpen) {
+      console.log("websocket.send("+sliderNumber+"s"+sliderValue.toString()+")");
       websocket.send(sliderNumber+"s"+sliderValue.toString());
+    }
 }
 
 function onMessage(event) {
