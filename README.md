@@ -1,5 +1,6 @@
 # composite_sketches
- ESP32-S2 USB composite device experiments
+ ESP32-S2 USB composite device experiments:  
+- [ESP32-SPIFFS-RGB-sliders](ESP32-SPIFFS-RGB-sliders/README)
  Built with Arduino ESP32 core 2.0.1 and libraries
 -  MIDI_Library 5.0.2
 -  ipMIDI 1.0.3
