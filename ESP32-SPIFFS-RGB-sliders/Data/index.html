@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ESP32-SPIFFS-PWM-SLIDER</title>
+    <title>ESP32-S2-SPIFFS-RGB-sliders</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
     <div class="topnav">
-        <h1>ESP32-SPIFFS-PWM-SLIDER-CONTROL LED</h1>
+        <h3>ESP32-S2-SPIFFS-RGB-sliders</h3>
     </div>
     <div class="content">
         <div class="card-grid">
             <div class="card">
-                <p class="card-title">ESP32-GIPIO-32</p>
+                <p class="card-title">ESP32-S2-WS2812-red</p>
                 <p class="switch">
                     <input type="range" onchange="updateSliderPWM(this)" id="slider1" min="0" max="100" step="1" value ="0" class="slider">
                 </p>
                 <p class="state">Brightness: <span id="sliderValue1"></span> &percnt;</p>
             </div>
             <div class="card">
-                <p class="card-title">ESP32-GIPIO-33</p>
+                <p class="card-title">ESP32-S2-WS2812-green</p>
                 <p class="switch">
                     <input type="range" onchange="updateSliderPWM(this)" id="slider2" min="0" max="100" step="1" value ="0" class="slider">
                 </p>
                 <p class="state">Brightness: <span id="sliderValue2"></span> &percnt;</p>
             </div>
             <div class="card">
-                <p class="card-title">ESP32-GIPIO-25</p>
+                <p class="card-title">ESP32-S2-WS2812-blue</p>
                 <p class="switch">
                     <input type="range" onchange="updateSliderPWM(this)" id="slider3" min="0" max="100" step="1" value ="0" class="slider">
                 </p>
@@ -35,6 +35,6 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script src="Script.js"></script>
 </body>
 </html>
