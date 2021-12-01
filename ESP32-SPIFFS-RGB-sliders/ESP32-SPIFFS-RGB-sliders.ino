@@ -30,7 +30,7 @@ void setSliderValue(uint8_t i)
   static bool first = true;
 
   sliderValue[i] = message.substring(2) + String((char)last);
-  wsrgb[i] = map(sliderValue[i].toInt(), 0, 100, 0, 15);
+  wsrgb[i] = map(sliderValue[i].toInt(), 0, 100, 0, 10);
   ws.textAll(getSliderValues());
   if (first) {
     first = false;
