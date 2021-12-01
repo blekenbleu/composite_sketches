@@ -1,4 +1,4 @@
-# composite_sketches
+# MIDI sketches
 Since MIDI does not work in composite USB with other devices,  
 Wi-Fi (especially WebSockets) is intersting  
 ## ESP32-S2 USB composite device experiments:  
