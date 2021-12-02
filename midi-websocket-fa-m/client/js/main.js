@@ -1,6 +1,6 @@
 $( document ).ready(function() {
 
-    const connection = new WebSocket('ws://localhost:9000');
+    const connection = new WebSocket('ws://localhost:6504');
 
     connection.onopen = function () {
         let message = 'BROADCASTER CONNECTED';
@@ -28,6 +28,9 @@ $( document ).ready(function() {
 
     };
 
+    connection.onclose = () => {
+            messageHandler('Web Socket Connection Closed');
+    };
 
     let context = new AudioContext(),
         oscillators = {};
@@ -104,11 +107,25 @@ $( document ).ready(function() {
 
     // CLICK HANDLER
     $('#ws-sendbutton').click(()=>{
-        let message = $('#ws-message').val();
-
+        let msg = $('#ws-message').val();
+//      let message = {data : [128, parseInt(msg), 0]};
+//      let message = new Uint8Array([144, msg, 20]);
+        let message = String.fromCharCode(144,parseInt(msg),20);
+        
         connection.send(message);
         messageHandler('Sent to Server: ' + message);
         $('#ws-message').val('');
     });
 
+    $('#ws-closebutton').click(()=>{
+       if(connection.readyState == WebSocket.OPEN) {
+         connection.close();
+         messageHandler('Sent close to Server');
+       }
+    });
+
+    window.addEventListener("unload", function () {
+      if(connection.readyState == WebSocket.OPEN)
+        connection.close();
+    });
 });

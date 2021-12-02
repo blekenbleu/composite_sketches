@@ -17,6 +17,11 @@ Wi-Fi (especially WebSockets) is intersting
 - [ESP32_NoteOnOffEverySec](ESP32_NoteOnOffEverySec)
 - [wESP32_NoteOnOffEverySec](wESP32_NoteOnOffEverySec)
 
+## JavaScript experiments
+- [midi-websocket-hhromic](midi-websocket-hhromic)
+- [midi-api-master](midi-api-master)
+- [midi-websocket-fa-m](midi-websocket-fa-m)
+
 ### Built with Arduino ESP32 core 2.0.1 and libraries
 -  MIDI_Library 5.0.2
 -  ipMIDI 1.0.3

@@ -1,0 +1,46 @@
+<html><head><title>MIDI WebSocket Client</title>
+<script src="eventemitter.min.js"></script>
+<script src="midiwsclient.js"></script>
+<script>
+var midiWsClient = new MidiWsClient('ws://192.168.1.144:6504');
+midiWsClient.on('connecting', function (wsUrl) {
+    console.log('Connecting ...');
+});
+midiWsClient.on('connect', function() {
+    console.log('Connected.');
+});
+midiWsClient.on('disconnect', function(event) {
+    console.log('Disconnected (' + event.code + ')');
+});
+midiWsClient.on('error', function(event) {
+    console.log('Error (' + event.message + ')');
+});
+midiWsClient.on('message', function(bytes) {
+    console.log('Received MIDI bytes: ' + bytes);
+});
+
+// CLICK HANDLERs
+    $('#ws-sendbutton').click(()=>{ 
+      midiWsClient.send(new Uint8Array([144, 0, 20])); // send MIDI
+    });
+
+    $('#ws-sendmidiID').click(()=>{ 
+      midiWsClient.sendMidiId('hhromicMIDIws'); // server uses for MIDI routing
+    });
+
+</script>
+</head>
+<body><h2>MIDI WebSocket Client</h2>
+A very simple event-driven Midi WebSocket client for JavaScript.
+
+<section>
+    <div id="sendMIDIid">
+        <input type="text" id="ws-midiID" value=""> <button id="ws-sendmidiID">SEND</button>
+    </div>
+</section> 
+
+<section>
+    <div id="sendMessage">
+        <input type="text" id="ws-message" value=""> <button id="ws-sendbutton">SEND</button>
+    </div>
+</section> 
