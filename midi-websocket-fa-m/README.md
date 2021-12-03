@@ -30,4 +30,5 @@ Everything sent by a USB-device will be broadcasted to clients connected via the
       WebSocketIO id: 3 closed
 ```
    .. so presumably need to associate those id's with WebSocket messages.
+   ... [multiplex?](https://ckousik.github.io/gsoc/2017/06/16/WebSocket-Multiplexer-Overview.html)
 
