@@ -20,12 +20,12 @@ midiWsClient.on('message', function(bytes) {
 });
 
 // CLICK HANDLERs
-    $('#ws-sendbutton').click(()=>{ 
-      midiWsClient.send(new Uint8Array([144, 0, 20])); // send MIDI
-    });
-
     $('#ws-sendmidiID').click(()=>{ 
       midiWsClient.sendMidiId('hhromicMIDIws'); // server uses for MIDI routing
+    });
+
+    $('#ws-sendbutton').click(()=>{ 
+      midiWsClient.send(new Uint8Array([144, 0, 20])); // send MIDI
     });
 
 </script>
