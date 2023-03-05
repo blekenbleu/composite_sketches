@@ -1,4 +1,6 @@
 # MIDI sketches
+*One of [several ESP32 repositories](https://github.com/blekenbleu/arduino-esp32#readme)*
+
 Since MIDI does not work in composite USB with other devices,  
 Wi-Fi (especially WebSockets) is intersting  
 ## ESP32-S2 USB composite device experiments:  
